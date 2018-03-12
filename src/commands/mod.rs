@@ -43,7 +43,12 @@ impl fmt::Display for CommandError {
     }
 }
 
-pub trait Command {
+struct ScriptedCommand {
+    uses_prefix: bool,
+    enabled_in_pm: bool,
+}
+
+pub trait Command: Send + Sync + 'static {
     fn execute(&self, _ctx: &mut Context, _msg: &Message, _args: &Vec<String>) -> CommandResult;
 }
 

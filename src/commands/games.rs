@@ -26,6 +26,8 @@ impl DiceRoll {
     }
 }
 
+const MAX_DICE: i32 = 12;
+
 impl Command for DiceRoll {
     fn execute(&self, _ctx: &mut Context, msg: &Message, args: &Vec<String>) -> CommandResult {
         if args.len() < 2 { 
@@ -40,22 +42,37 @@ impl Command for DiceRoll {
                 None => Ok(1),
             }.unwrap_or(1);
 
-            let range = Range::new(1, 1+match cap.get(2) {
+            let sides = match cap.get(2) {
                 Some(m) => m.as_str().parse::<i32>(),
                 None => Ok(6),
-            }.unwrap_or(6));
+            }.unwrap_or(6);
             
             let add = match cap.get(3) {
                 Some(m) => m.as_str().parse::<i32>(),
                 None => Ok(0),
             }.unwrap_or(0);
 
-            let mut sum = add;
-            for _ in 0..num {
-                sum += range.ind_sample(&mut rng);
+            let mut throws = String::new();
+            let sum = add + if num > MAX_DICE {
+                throws = "too many dice to list".to_string();
+                Range::new(num, sides*num).ind_sample(&mut rng)
             }
+            else {
+                let range = Range::new(1, 1+sides);
+                let mut sum = 0;
+                for i in 0..num {
+                    if i != 0 {
+                        throws.push_str(", ");
+                    }
+                    let throw = range.ind_sample(&mut rng);
+                    throws.push_str(&throw.to_string());
+                    sum += throw;
+                }
+                sum
+            };
+            
 
-            msg.reply(&format!("{}", sum))?;
+            msg.reply(&format!("{} - [{}]", sum, throws))?;
             Ok(())
         }
         else {
@@ -76,14 +93,15 @@ impl Roulette {
 impl Command for Roulette {
     fn execute(&self, ctx: &mut Context, msg: &Message, args: &Vec<String>) -> Result<(), CommandError> {
         if let Some(ch) = msg.channel() {
-            match ch {
+            // TODO: Clean up this mess
+            match ch { 
                 Channel::Group(group_lock) => {
                     group_lock.read().say("Sorry, this only works in guild chatrooms for now.")?; // TODO
                     return Ok(());
                 },
                 Channel::Guild(guild_lock) => {
                     let channel = guild_lock.read();
-                    let winner = if let Some(guild) = msg.guild() {
+                    let winner = if let Some(guild) = msg.guild() { 
                         let g = guild.read();
                         let members: Vec<&serenity::model::guild::Member> = g.members_with_status(serenity::model::user::OnlineStatus::Online)
                             .into_iter().filter(|m| {
