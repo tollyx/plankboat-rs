@@ -298,7 +298,8 @@ impl Command for AnimeCommand {
                     .embed(|e| e
                         .author(|a| a
                             .name("MyAnimeList")
-                            .url("https://myanimelist.net/"))
+                            .url("https://myanimelist.net/")
+                            .icon_url("https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png"))
                         .title(&entry.title)
                         .description(&entry.synopsis)
                         .thumbnail(&entry.image)
@@ -355,7 +356,8 @@ impl Command for MangaCommand {
                     .embed(|e| e
                         .author(|a| a
                             .name("MyAnimeList")
-                            .url("https://myanimelist.net/"))
+                            .url("https://myanimelist.net/")
+                            .icon_url("https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png"))
                         .title(&entry.title)
                         .description(&entry.synopsis)
                         .thumbnail(&entry.image)
