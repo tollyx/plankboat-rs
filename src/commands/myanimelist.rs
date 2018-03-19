@@ -5,10 +5,8 @@ use quick_xml;
 
 use quick_xml::events::Event;
 
-use regex;
-
 use serenity::client::Context;
-use serenity::model::channel::{Message, Channel, Embed};
+use serenity::model::channel::Message;
 use serenity::utils::Colour;
 
 const ANIME_URL: &str = "https://myanimelist.net/api/anime/search.xml";
@@ -241,7 +239,7 @@ impl MyAnimeListApi {
     }
 
     pub fn search_anime(&self, query: &str) -> Result<Entry, CommandError> {
-        let mut res = self.query(ANIME_URL, query)?;
+        let res = self.query(ANIME_URL, query)?;
 
         if res.status().is_success() {
             if let Ok(entry) = self.parse_response(res) {
@@ -257,7 +255,7 @@ impl MyAnimeListApi {
     }
 
     pub fn search_manga(&self, query: &str) -> Result<Entry, CommandError> {
-        let mut res = self.query(MANGA_URL, query)?;
+        let res = self.query(MANGA_URL, query)?;
 
         if res.status().is_success() {
             if let Ok(entry) = self.parse_response(res) {
@@ -295,7 +293,7 @@ impl Command for AnimeCommand {
         let query = _args[1..].join(&" ");
 
         match self.mal.search_anime(&query) {
-            Ok(mut entry) => {
+            Ok(entry) => {
                 let _ = _msg.channel_id.send_message(|m| m
                     .embed(|e| e
                         .author(|a| a
@@ -352,7 +350,7 @@ impl Command for MangaCommand {
         let query = _args[1..].join(&" ");
 
         match self.mal.search_manga(&query) {
-            Ok(mut entry) => {
+            Ok(entry) => {
                 let _ = _msg.channel_id.send_message(|m| m
                     .embed(|e| e
                         .author(|a| a

@@ -95,7 +95,7 @@ impl Roulette {
 }
 
 impl Command for Roulette {
-    fn execute(&self, ctx: &mut Context, msg: &Message, args: &Vec<String>) -> Result<(), CommandError> {
+    fn execute(&self, _ctx: &mut Context, msg: &Message, _args: &Vec<String>) -> Result<(), CommandError> {
         if let Some(ch) = msg.channel() {
             // TODO: Clean up this mess
             match ch { 
@@ -129,7 +129,7 @@ impl Command for Roulette {
                     group_lock.read().say("Oh shit, bots inside groups are supported now?!?!")?;
                     return Ok(());
                 },
-                c => {
+                _ => {
                     msg.reply("???")?;
                     return Err(CommandError::Other(format!("Somehow got a command from somewhere unexpected (by: {})", msg.author.tag())));
                 }

@@ -19,7 +19,7 @@ pub struct PlankFramework {
 
 impl PlankFramework {
     pub fn new() -> PlankFramework {
-        let mut fw = PlankFramework {
+        let fw = PlankFramework {
             command_prefix: "^",
             commands: HashMap::new(),
         };
