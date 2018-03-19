@@ -29,8 +29,8 @@ impl EventHandler for PlankHandler {
         info!("Resumed! (shard: {})", ctx.shard_id);
     }
 
-    fn guild_create(&self, ctx: Context, guild: Guild, new: bool) {
-        info!("Joined guild '{}' (shard: {}, new: {})", guild.name, ctx.shard_id, new);
+    fn guild_create(&self, ctx: Context, guild: Guild, cached: bool) {
+        info!("Joined guild '{}' (shard: {}, cached: {})", guild.name, ctx.shard_id, cached);
     }
 
     fn guild_delete(&self, ctx: Context, part_guild: PartialGuild, _guildcache: Option<Arc<RwLock<Guild>>>) {

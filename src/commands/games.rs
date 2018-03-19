@@ -71,8 +71,12 @@ impl Command for DiceRoll {
                 sum
             };
             
-
-            msg.reply(&format!("{} - [{}]", sum, throws))?;
+            if num > 1 {
+                msg.reply(&format!("{} \n[ {} ]", sum, throws))?;
+            }
+            else {
+                msg.reply(&format!("{}", sum))?;
+            }
             Ok(())
         }
         else {
@@ -95,10 +99,6 @@ impl Command for Roulette {
         if let Some(ch) = msg.channel() {
             // TODO: Clean up this mess
             match ch { 
-                Channel::Group(group_lock) => {
-                    group_lock.read().say("Sorry, this only works in guild chatrooms for now.")?; // TODO
-                    return Ok(());
-                },
                 Channel::Guild(guild_lock) => {
                     let channel = guild_lock.read();
                     let winner = if let Some(guild) = msg.guild() { 
@@ -119,13 +119,19 @@ impl Command for Roulette {
                     };
                     channel.say(&format!("And the winner is: {}", winner))?;
                 },
+
+                // Invalid channels
                 Channel::Private(private_lock) => {
                     private_lock.read().say("It wouldn't make much sense to have a roulette in here would it?")?;
                     return Ok(());
                 }
-                Channel::Category(_) => {
+                Channel::Group(group_lock) => {
+                    group_lock.read().say("Oh shit, bots inside groups are supported now?!?!")?;
+                    return Ok(());
+                },
+                c => {
                     msg.reply("???")?;
-                    return Err(CommandError::Other(format!("Somehow got a command from a category (from: {})", msg.author.tag())));
+                    return Err(CommandError::Other(format!("Somehow got a command from somewhere unexpected (by: {})", msg.author.tag())));
                 }
             };
 

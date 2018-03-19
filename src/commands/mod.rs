@@ -1,11 +1,14 @@
 use serenity::client::Context;
 use serenity::model::channel::Message;
 use serenity;
+use quick_xml;
+use reqwest;
 
 use std::fmt;
 use std::sync::Arc;
 
 pub mod games;
+pub mod myanimelist;
 
 pub type CommandResult = Result<(), CommandError>;
 
@@ -17,8 +20,22 @@ impl From<CommandError> for CommandResult {
 
 pub enum CommandError {
     Serenity(serenity::Error),
+    Xml(quick_xml::Error),
+    Reqwest(reqwest::Error),
     Argument(String),
     Other(String),
+}
+
+impl From<reqwest::Error> for CommandError {
+    fn from(err: reqwest::Error) -> CommandError {
+        CommandError::Reqwest(err)
+    }
+}
+
+impl From<quick_xml::Error> for CommandError {
+    fn from(err: quick_xml::Error) -> CommandError {
+        CommandError::Xml(err)
+    }
 }
 
 impl From<serenity::Error> for CommandError {
@@ -30,8 +47,14 @@ impl From<serenity::Error> for CommandError {
 impl fmt::Display for CommandError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
+            CommandError::Reqwest(ref err) => {
+                write!(f, "Reqwest error while executing a command: {}", err)
+            },
+            CommandError::Xml(ref err) => {
+                write!(f, "quick_xml error while executing a command: {}", err)
+            },
             CommandError::Serenity(ref err) => {
-                write!(f, "Error executing a command: {}", err)
+                write!(f, "Serenity error while executing a command: {}", err)
             },
             CommandError::Argument(ref s) => {
                 write!(f, "Invalid arguments to a command: {}", s)

@@ -2,3 +2,5 @@
 /target/
 **/*.rs.bk
 *.bat
+*.sqlite
+config.toml
